@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>延时回响 · 立即游玩</title>
+<style>
+  :root{
+    --ink:#3a3f52;
+    --ink-dim:#7b8398;
+    --line:#e6e9f0;
+    --lav:#8b81c0;
+    --lav-deep:#5d538f;
+    --lav-soft:#b6aedb;
+    --paper:#fbfbfd;
+    --gold:#c9a961;
+    --card:#ffffff;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    min-height:100vh;
+    background:
+      radial-gradient(1100px 620px at 12% -8%, #eef0f8 0%, rgba(238,240,248,0) 62%),
+      radial-gradient(900px 560px at 100% 0%, #f3eef9 0%, rgba(243,238,249,0) 58%),
+      var(--paper);
+    color:var(--ink);
+    font:16px/1.7 "Microsoft YaHei","PingFang SC","Hiragino Sans GB",-apple-system,sans-serif;
+    display:flex;align-items:center;justify-content:center;
+    padding:28px 18px 40px;
+  }
+  .wrap{width:100%;max-width:680px;margin:0 auto}
+
+  /* ---- 头部 ---- */
+  .eyebrow{
+    font-size:12px;letter-spacing:.16em;color:var(--lav);
+    text-align:center;margin-bottom:14px;font-weight:600;
+  }
+  h1{
+    margin:0;text-align:center;font-size:clamp(26px,6vw,38px);
+    font-weight:800;letter-spacing:.02em;line-height:1.28;
+  }
+  h1 em{
+    font-style:normal;color:var(--lav-deep);
+    display:block;font-size:clamp(15px,3.4vw,19px);
+    font-weight:600;margin-top:10px;letter-spacing:.03em;
+  }
+  .rule{
+    width:56px;height:2px;margin:22px auto 0;
+    background:linear-gradient(90deg,transparent,var(--lav-soft),transparent);
+  }
+
+  /* ---- 提示条 ---- */
+  .hint{
+    margin:26px auto 0;max-width:560px;
+    background:#fff;border:1px solid var(--line);border-radius:14px;
+    padding:16px 18px;font-size:14.5px;color:var(--ink-dim);
+    display:flex;gap:12px;align-items:flex-start;
+    box-shadow:0 6px 20px rgba(96,108,138,.06);
+  }
+  .hint b{color:var(--ink);font-weight:700}
+  .hint .dot{
+    flex:0 0 auto;width:8px;height:8px;border-radius:50%;
+    background:var(--lav);margin-top:9px;
+  }
+
+  /* ---- 链接卡 ---- */
+  .cards{margin-top:22px;display:grid;gap:14px}
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:16px;
+    padding:20px 20px 18px;
+    box-shadow:0 10px 30px rgba(96,108,138,.08);
+    position:relative;overflow:hidden;
+  }
+  .card::before{
+    content:"";position:absolute;left:0;top:0;bottom:0;width:4px;
+    background:linear-gradient(180deg,var(--lav-soft),var(--lav));
+  }
+  .card h2{
+    margin:0 0 4px;font-size:19px;font-weight:700;
+    display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  }
+  .tag{
+    font-size:11.5px;font-weight:600;letter-spacing:.04em;
+    color:var(--lav-deep);background:#f1eefa;
+    border:1px solid #e2dcf5;border-radius:999px;padding:2px 10px;
+  }
+  .tag.alt{color:#8a6a20;background:#fbf3e0;border-color:#f0e4c8}
+  .desc{margin:6px 0 14px;font-size:13.5px;color:var(--ink-dim)}
+
+  .urlbox{
+    display:flex;align-items:center;gap:10px;
+    background:#f5f6fa;border:1px solid var(--line);border-radius:11px;
+    padding:11px 13px;
+  }
+  .urlbox code{
+    flex:1 1 auto;min-width:0;
+    font:600 13.5px/1.5 ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace;
+    color:var(--ink);word-break:break-all;
+  }
+  .copy{
+    flex:0 0 auto;cursor:pointer;
+    font:600 13.5px/1 "Microsoft YaHei",sans-serif;
+    color:#fff;background:var(--lav);
+    border:none;border-radius:8px;padding:9px 15px;
+    transition:background .15s,transform .06s;
+  }
+  .copy:hover{background:var(--lav-deep)}
+  .copy:active{transform:scale(.96)}
+  .copy.ok{background:#4a9a6e}
+
+  .open{
+    display:block;text-align:center;margin-top:12px;
+    font-size:13.5px;color:var(--lav-deep);text-decoration:none;
+    border:1px dashed #d5cdee;border-radius:9px;padding:9px;
+    transition:background .15s;
+  }
+  .open:hover{background:#f6f3fd}
+
+  /* ---- 补充 ---- */
+  .extra{
+    margin-top:26px;background:#fff;border:1px solid var(--line);
+    border-radius:14px;padding:16px 18px;font-size:13.5px;color:var(--ink-dim);
+  }
+  .extra b{color:var(--ink)}
+  .extra ul{margin:9px 0 0;padding-left:20px}
+  .extra li{margin:4px 0}
+
+  footer{
+    margin-top:22px;text-align:center;font-size:12.5px;color:#a3a9ba;
+  }
+  .toast{
+    position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);
+    background:rgba(42,36,48,.94);color:#fff;font-size:14px;
+    padding:11px 20px;border-radius:10px;opacity:0;
+    transition:opacity .22s,transform .22s;pointer-events:none;
+    box-shadow:0 10px 30px rgba(0,0,0,.2);
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow">DELAYED ECHO · 惠州学院</div>
+  <h1>延时回响<em>影子是过去的你。你得先迈出去。</em></h1>
+  <div class="rule"></div>
+
+  <div class="hint">
+    <span class="dot"></span>
+    <div><b>推荐用电脑打开</b> —— 键盘操作手感好得多。手机也能玩，触屏有虚拟按键，但不如电脑。<br>
+    下面两个网址都可以<b>一键复制</b>：手机复制后粘进手机浏览器；电脑复制后回到电脑浏览器粘贴打开。</div>
+  </div>
+
+  <div class="cards">
+
+    <div class="card">
+      <h2>开始游戏 <span class="tag">6 关 · 17 种机关</span></h2>
+      <div class="desc">2D 物理解谜 · 平台跳跃 · 打开网页立刻可玩，不用下载、不用登录</div>
+      <div class="urlbox">
+        <code id="u1">https://zzt970.github.io/delayed-echo-game/</code>
+        <button class="copy" data-target="u1">复制</button>
+      </div>
+      <a class="open" href="https://zzt970.github.io/delayed-echo-game/" target="_blank" rel="noopener">直接打开 ▶</a>
+    </div>
+
+    <div class="card">
+      <h2>关卡编辑器 <span class="tag alt">自己造关卡</span></h2>
+      <div class="desc">100 × 100 画布，拖方块就能画关卡，一键发给同学直接玩</div>
+      <div class="urlbox">
+        <code id="u2">https://zzt970.github.io/delayed-echo-editor/</code>
+        <button class="copy" data-target="u2">复制</button>
+      </div>
+      <a class="open" href="https://zzt970.github.io/delayed-echo-editor/" target="_blank" rel="noopener">直接打开 ▶</a>
+    </div>
+
+  </div>
+
+  <div class="extra">
+    <b>关于这个游戏</b>
+    <ul>
+      <li>你走过的路会被记住。按 <b>R</b>，它会变成另一个你，沿原路再走一遍。</li>
+      <li>影子不会死，也不怕刺 —— 但它踩塌的桥不会长回来，踩错而立起的墙不会退。</li>
+      <li>纯前端单文件，静态托管，没有后端、没有数据库、零服务器费用。</li>
+    </ul>
+  </div>
+
+  <footer>钟梓涛 · 陈浩杰 · 陈立业　|　惠州学院</footer>
+</div>
+
+<div class="toast" id="toast">已复制</div>
+
+<script>
+(function(){
+  var toast = document.getElementById('toast');
+  var timer = null;
+  function show(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(timer);
+    timer = setTimeout(function(){ toast.classList.remove('show'); }, 1800);
+  }
+  function copyText(txt){
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      return navigator.clipboard.writeText(txt);
+    }
+    return new Promise(function(res, rej){
+      var ta = document.createElement('textarea');
+      ta.value = txt;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.focus(); ta.select();
+      var ok = false;
+      try { ok = document.execCommand('copy'); } catch(e){ ok = false; }
+      document.body.removeChild(ta);
+      ok ? res() : rej(new Error('copy failed'));
+    });
+  }
+  document.querySelectorAll('.copy').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var el = document.getElementById(btn.getAttribute('data-target'));
+      var txt = el.textContent.trim();
+      copyText(txt).then(function(){
+        btn.textContent = '已复制 ✓';
+        btn.classList.add('ok');
+        show('已复制：' + txt);
+        setTimeout(function(){ btn.textContent = '复制'; btn.classList.remove('ok'); }, 2000);
+      }).catch(function(){
+        // 降级：全选让用户自己复制
+        var r = document.createRange();
+        r.selectNodeContents(el);
+        var sel = window.getSelection();
+        sel.removeAllRanges(); sel.addRange(r);
+        show('请按 Ctrl+C / ⌘C 复制');
+      });
+    });
+  });
+})();
+</script>
+</body>
+</html>
